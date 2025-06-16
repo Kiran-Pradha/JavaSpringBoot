@@ -1,17 +1,27 @@
-# Use Java 17 base image
+# Use a lightweight JDK base image
 FROM openjdk:17-jdk-slim
-
-# Set environment variable (optional default)
-ENV APP_PORT=8080
 
 # Set working directory
 WORKDIR /app
 
-# Copy built JAR file
-COPY target/demo-0.0.1-SNAPSHOT.jar app.jar
+# Copy Gradle wrapper and build files first (for caching)
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
 
-# Expose port (for documentation)
+# Give permission to gradlew
+RUN chmod +x gradlew
+
+# Copy the rest of the source code
+COPY src src
+
+# Build the application
+RUN ./gradlew bootJar
+
+# Expose port
+ENV APP_PORT=8080
 EXPOSE ${APP_PORT}
 
-# Start app using environment variable
-CMD ["sh", "-c", "java -jar app.jar --server.port=${APP_PORT}"]
+# Run the JAR
+CMD ["sh", "-c", "java -jar build/libs/*.jar --server.port=${APP_PORT}"]
