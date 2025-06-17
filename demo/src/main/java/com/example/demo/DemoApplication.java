@@ -1,10 +1,9 @@
-@SpringBootApplication
 @RestController
 public class DemoApplication {
 
     @GetMapping("/")
     public String hello() {
-        return "Hello from Java!";
+        return "Hello from Java Spring Boot with Gradle!";
     }
 
     @GetMapping("/health")
